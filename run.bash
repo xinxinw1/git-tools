@@ -10,7 +10,7 @@ function run {
     git archive gh-pages | tar -xC /srv/http/git-preview
   fi
   
-  git deps -nc -d /srv/http/git-preview
+  git deps -l -o /srv/http/git-preview
 }
 
 run
