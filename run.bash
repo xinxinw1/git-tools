@@ -10,7 +10,7 @@ function run {
   if git show-ref --verify --quiet "refs/heads/$bran"; then
     local dir="/srv/http/git-preview/$d"
     
-    rm -r "$dir"/* 2>/dev/null
+    rm -r "$dir" 2>/dev/null
     mkdir "$dir"
     
     local b="$(git rev-parse --abbrev-ref HEAD)"
