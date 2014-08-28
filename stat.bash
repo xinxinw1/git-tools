@@ -13,7 +13,7 @@ function git-stat {
       local str="$(git status --porcelain 2>&1)"
       if [ -n "$str" ]; then
         echo "$dir"
-        git status --porcelain
+        echo "$str"
       fi
       cd ../
     done
@@ -21,7 +21,7 @@ function git-stat {
     local str="$(git status --porcelain 2>&1)"
     if [ -n "$str" ]; then
       echo "./"
-      git status --porcelain
+      echo "$str"
     fi
   fi
   
