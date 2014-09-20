@@ -5,7 +5,8 @@ function run {
   # b = current branch
   local b="$(git rev-parse --abbrev-ref HEAD)"
   
-  local cur=
+  local upd=
+  local lat=
   local sta=
   local out="/srv/http/git-preview/$d"
   local arr=()
@@ -14,8 +15,11 @@ function run {
     shift
     
     case $key in
-      -c|--current)
-        cur="true"
+      -u|--update)
+        upd="true"
+      ;;
+      -l|--latest)
+        lat="true"
       ;;
       -s|--stable)
         sta="true"
@@ -36,12 +40,14 @@ function run {
         echo "Warning: unknown option $key" 1>&2
       ;;
       *)
-        arr+=("$1")
+        arr+=("$key")
       ;;
     esac
   done
   
-  local bran="${arr[1]}"
+  [ "$debug" == "true" ] && echo "${arr[@]}"
+  
+  local bran="${arr[0]}"
   [ -z "$bran" ] && bran="$b"
   
   if [ "$debug" == "true" ]; then
@@ -55,23 +61,22 @@ function run {
       rm -rf "$out" 2>/dev/null
       mkdir "$out"
       
+      local dflag=""
+      [ "$debug" == "true" ] && dflag="-d"
+      
       if [ "$bran" == "$b" ]; then
         [ "$debug" == "true" ] && echo "Running current branch"
+        [ "$upd" == "true" ] && git deps $dflag
         cp -r * "$out"
       else
         [ "$debug" == "true" ] && echo "Running non-current branch"
         git archive "$bran" | tar -xC "$out"
       fi
       
-      local dflag=""
-      [ "$debug" == "true" ] && dflag="-d"
-      
-      if [ "$cur" != "true" ]; then
-        if [ "$sta" == "true" ]; then
-          git deps -f "$out/deps" -o "$out" $dflag
-        else
-          git deps -l -f "$out/deps" -o "$out" $dflag
-        fi
+      if [ "$sta" == "true" ]; then
+        git deps -f "$out/deps" -o "$out" $dflag
+      elif [ "$lat" == "true" ]; then
+        git deps -l -f "$out/deps" -o "$out" $dflag
       fi
     fi
   else
