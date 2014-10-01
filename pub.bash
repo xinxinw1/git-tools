@@ -71,7 +71,7 @@ function pub {
       
       if [ "$bran" == "$b" ]; then
         [ "$debug" == "true" ] && echo "Running current branch"
-        find . -mindepth 1 -maxdepth 1 ! -name .git -exec cp -r {} "$out" +
+        find . -mindepth 1 -maxdepth 1 ! -name .git -exec cp -r -t "$out" {} +
       else
         [ "$debug" == "true" ] && echo "Running non-current branch"
         git archive "$bran" | tar -xC "$out"
