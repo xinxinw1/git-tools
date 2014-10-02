@@ -6,8 +6,8 @@ function pub {
   # b = current branch
   local b="$(git rev-parse --abbrev-ref HEAD)"
   
-  local debug=
   local nomet=
+  local debug=
   local out="/srv/http/codes/$d"
   local arr=()
   while [[ $# > 0 ]]; do
@@ -44,7 +44,7 @@ function pub {
   
   if [ "$debug" == "true" ]; then
     echo "Output is $out"
-    echo "Branch is $bran"
+    echo "Treeish is $bran"
   fi
   
   # http://stackoverflow.com/questions/5167957/is-there-a-better-way-to-find-out-if-a-local-git-branch-exists
@@ -77,22 +77,22 @@ function pub {
         echo "$(date)" >> "$out/pub"
         echo "Source is $orig" >> "$out/pub"
         echo "Output is $out" >> "$out/pub"
-        echo "Branch is $bran" >> "$out/pub"
+        echo "Treeish is $bran" >> "$out/pub"
       fi
       
       if [ "$bran" == "$b" ]; then
-        [ "$debug" == "true" ] && echo "Running current branch"
+        [ "$debug" == "true" ] && echo "Publishing current branch"
         [ -z "$nomet" ] && echo "Publishing current branch" >> "$out/pub"
         find . -mindepth 1 -maxdepth 1 ! -name .git -exec cp -r -t "$out" {} +
       else
-        [ "$debug" == "true" ] && echo "Running non-current branch"
-        [ -z "$nomet" ] &&echo "Publishing non-current branch" >> "$out/pub"
+        [ "$debug" == "true" ] && echo "Publishing non-current branch"
+        [ -z "$nomet" ] && echo "Publishing non-current branch" >> "$out/pub"
         git archive "$bran" | tar -xC "$out"
       fi
       
     fi
   else
-    echo "Error: no branch $bran" >&2
+    echo "Error: no treeish $bran" >&2
   fi
 }
 
