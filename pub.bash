@@ -1,11 +1,13 @@
 #!/bin/bash
 
 function pub {
+  local orig="$PWD"
   local d="${PWD##*/}"   # original directory
   # b = current branch
   local b="$(git rev-parse --abbrev-ref HEAD)"
   
   local debug=
+  local nomet=
   local out="/srv/http/codes/$d"
   local arr=()
   while [[ $# > 0 ]]; do
@@ -22,6 +24,9 @@ function pub {
         fi
         shift
       ;;
+      -n|--no-meta)
+        nomet="true"
+      ;;
       -d|--debug)
         debug="true"
       ;;
@@ -34,8 +39,6 @@ function pub {
     esac
   done
   
-  [ "$debug" == "true" ] && echo "${arr[@]}"
-  
   local bran="${arr[0]}"
   [ -z "$bran" ] && bran="$b"
   
@@ -45,14 +48,15 @@ function pub {
   fi
   
   # http://stackoverflow.com/questions/5167957/is-there-a-better-way-to-find-out-if-a-local-git-branch-exists
-  if git show-ref --verify --quiet "refs/heads/$bran"; then
+  # if git show-ref --verify --quiet "refs/heads/$bran"; then
+  if git ls-tree "$bran" 1>/dev/null 2>&1; then
     if [ "$out" != "/dev/null" ]; then
       if [ -d "$out" ]; then
         while true; do
-          read -p "Output dir $out exists? Delete and replace it? [Yn]" yn
+          read -p "Output dir $out exists? Delete and replace it? [Yn] " yn
           case $yn in
             [Yy]* | "")
-              rm -rf "$out" 2>/dev/null
+              rm -rf "$out"
               break
             ;;
             [Nn]*)
@@ -69,13 +73,23 @@ function pub {
       local dflag=""
       [ "$debug" == "true" ] && dflag="-d"
       
+      if [ -z "$nomet" ]; then
+        echo "$(date)" >> "$out/pub"
+        echo "Source is $orig" >> "$out/pub"
+        echo "Output is $out" >> "$out/pub"
+        echo "Branch is $bran" >> "$out/pub"
+      fi
+      
       if [ "$bran" == "$b" ]; then
         [ "$debug" == "true" ] && echo "Running current branch"
+        [ -z "$nomet" ] && echo "Publishing current branch" >> "$out/pub"
         find . -mindepth 1 -maxdepth 1 ! -name .git -exec cp -r -t "$out" {} +
       else
         [ "$debug" == "true" ] && echo "Running non-current branch"
+        [ -z "$nomet" ] &&echo "Publishing non-current branch" >> "$out/pub"
         git archive "$bran" | tar -xC "$out"
       fi
+      
     fi
   else
     echo "Error: no branch $bran" >&2
