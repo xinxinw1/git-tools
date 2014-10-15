@@ -11,7 +11,7 @@ function galias {
       -g|--global)
         opts="$opts --global"
       ;;
-      -u|--unset)
+      -u|-d|--unset)
         opts="$opts --unset"
       ;;
       *)
