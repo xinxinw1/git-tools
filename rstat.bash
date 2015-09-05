@@ -4,7 +4,7 @@ function git-rstat {
   local orig="$PWD"   # original directory
   
   local base="$1"
-  [ -z "$base" ] && base="/home/secret2008/Documents/Program/git"
+  [ -z "$base" ] && base="/srv/git"
   
   cd "$base"
   if [ "$(echo */)" != "*/" ]; then
