@@ -1,0 +1,29 @@
+#!/bin/bash
+# https://coderwall.com/p/bt93ia/extend-git-with-custom-commands
+# sudo cp /srv/git/git-tools/git-stat /usr/bin/git-stat
+
+orig="$PWD"   # original directory
+
+base="$1"
+[ -z "$base" ] && base="/srv/git"
+
+cd "$base"
+if [ "$(echo */)" != "*/" ]; then
+  for dir in */; do
+    cd "$dir"
+    str="$(git status --porcelain 2>&1)"
+    if [ -n "$str" ]; then
+      echo "$dir"
+      echo "$str"
+    fi
+    cd ../
+  done
+else
+  str="$(git status --porcelain 2>&1)"
+  if [ -n "$str" ]; then
+    echo "./"
+    echo "$str"
+  fi
+fi
+
+cd "$orig"
